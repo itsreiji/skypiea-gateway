@@ -1,14 +1,3 @@
-model_list:
-  - model_name: sherlock-think-alpha
-    litellm_params:
-      model: openrouter/sherlock-think-alpha
-      api_key: os.environ/OPENROUTER_API_KEY
-  - model_name: sherlock-dash-alpha
-    litellm_params:
-      model: openrouter/sherlock-dash-alpha
-      api_key: os.environ/OPENROUTER_API_KEY
-
-
 litellm_settings:
   # set_verbose: True  # Uncomment this if you want to see verbose logs; not recommended in production
   drop_params: True
