@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "litellm"
+name = "Skypiea Gateway"
 version = "1.80.0"
 description = "Library to easily interface with LLM API providers"
 authors = ["SkypieaLabs"]
@@ -11,12 +11,12 @@ packages = [
 ]
 
 [tool.poetry.urls]
-homepage = "https://litellm.ai"
-Homepage = "https://litellm.ai"
+homepage = "https://skypiea.io"
+Homepage = "https://skypiea.io"
 repository = "https://github.com/itsreiji/litellm"
 Repository = "https://github.com/itsreiji/litellm"
-documentation = "https://docs.litellm.ai"
-Documentation = "https://docs.litellm.ai"
+documentation = "https://docs.skypiea.io"
+Documentation = "https://docs.skypiea.io"
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0, !=3.9.7"

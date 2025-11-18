@@ -1,153 +1,28 @@
 model_list:
-  - model_name: gpt-3.5-turbo-end-user-test
+  - model_name: sherlock-think-alpha
     litellm_params:
-      model: gpt-3.5-turbo
-      region_name: "eu"
-    model_info:
-      id: "1"
-  - model_name: gpt-3.5-turbo-end-user-test
+      model: openrouter/sherlock-think-alpha
+      api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: sherlock-dash-alpha
     litellm_params:
-      model: openai/gpt-4.1-mini
-      api_key: os.environ/OPENAI_API_KEY # The `os.environ/` prefix tells litellm to read this from the env. See https://docs.litellm.ai/docs/simple_proxy#load-api-keys-from-vault
-  - model_name: gpt-3.5-turbo
-    litellm_params:
-      model: openai/gpt-4.1-mini
-      api_key: os.environ/OPENAI_API_KEY # The `os.environ/` prefix tells litellm to read this from the env. See https://docs.litellm.ai/docs/simple_proxy#load-api-keys-from-vault
-  - model_name: gpt-3.5-turbo-large
-    litellm_params: 
-      model: "gpt-3.5-turbo-1106"
-      api_key: os.environ/OPENAI_API_KEY
-      rpm: 480
-      timeout: 300
-      stream_timeout: 60
-  - model_name: gpt-4
-    litellm_params:
-      model: openai/gpt-4.1-mini
-      api_key: os.environ/OPENAI_API_KEY # The `os.environ/` prefix tells litellm to read this from the env. See https://docs.litellm.ai/docs/simple_proxy#load-api-keys-from-vault
-      rpm: 480
-      timeout: 300
-      stream_timeout: 60
-  - model_name: sagemaker-completion-model
-    litellm_params:
-      model: sagemaker/berri-benchmarking-Llama-2-70b-chat-hf-4
-      input_cost_per_second: 0.000420  
-  - model_name: text-embedding-ada-002
-    litellm_params: 
-      model: openai/text-embedding-ada-002
-      api_key: os.environ/OPENAI_API_KEY
-    model_info:
-      mode: embedding
-      base_model: text-embedding-ada-002
-  - model_name: dall-e-2 # some tests use dall-e-2 which is now deprecated, alias to dall-e-3
-    litellm_params:
-      model: openai/dall-e-3
-  - model_name: openai-dall-e-3
-    litellm_params:
-      model: dall-e-3
-  - model_name: fake-openai-endpoint
-    litellm_params:
-      model: openai/fake
-      api_key: fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-  - model_name: fake-openai-endpoint-2
-    litellm_params:
-      model: openai/my-fake-model
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      stream_timeout: 0.001
-      rpm: 1
-  - model_name: fake-openai-endpoint-3
-    litellm_params:
-      model: openai/my-fake-model
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      stream_timeout: 0.001
-      rpm: 1000
-  - model_name: fake-openai-endpoint-4
-    litellm_params:
-      model: openai/my-fake-model
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      num_retries: 50
-  - model_name: fake-openai-endpoint-3
-    litellm_params:
-      model: openai/my-fake-model-2
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      stream_timeout: 0.001
-      rpm: 1000
-  - model_name: bad-model
-    litellm_params:
-      model: openai/bad-model
-      api_key: os.environ/OPENAI_API_KEY
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      mock_timeout: True
-      timeout: 60
-      rpm: 1000
-    model_info:
-      health_check_timeout: 1
-  - model_name: good-model
-    litellm_params:
-      model: openai/bad-model
-      api_key: os.environ/OPENAI_API_KEY
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      rpm: 1000
-    model_info:
-      health_check_timeout: 1
-  - model_name: "*"
-    litellm_params:
-      model: openai/*
-      api_key: os.environ/OPENAI_API_KEY
-  
-
-  # provider specific wildcard routing
-  - model_name: "anthropic/*"
-    litellm_params:
-      model: "anthropic/*"
-      api_key: os.environ/ANTHROPIC_API_KEY
-  - model_name: "bedrock/*"
-    litellm_params:
-      model: "bedrock/*"
-  - model_name: "groq/*"
-    litellm_params:
-      model: "groq/*"
-      api_key: os.environ/GROQ_API_KEY
-  - model_name: mistral-embed
-    litellm_params:
-      model: mistral/mistral-embed
-  - model_name: gpt-instruct # [PROD TEST] - tests if `/health` automatically infers this to be a text completion model
-    litellm_params:
-      model: text-completion-openai/gpt-3.5-turbo-instruct
-  - model_name: fake-openai-endpoint-5
-    litellm_params:
-      model: openai/my-fake-model
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-      timeout: 1
-  - model_name: badly-configured-openai-endpoint
-    litellm_params:
-      model: openai/my-fake-model
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.appxxxx/
-  - model_name: gemini-1.5-flash
-    litellm_params:
-      model: gemini/gemini-1.5-flash
-      api_key: os.environ/GOOGLE_API_KEY
-  - model_name: gpt-4o
-    litellm_params:
-      model: gpt-4o
-      api_key: os.environ/OPENAI_API_KEY
+      model: openrouter/sherlock-dash-alpha
+      api_key: os.environ/OPENROUTER_API_KEY
 
 
 litellm_settings:
   # set_verbose: True  # Uncomment this if you want to see verbose logs; not recommended in production
   drop_params: True
-  # max_budget: 100 
+  # max_budget: 100
   # budget_duration: 30d
   num_retries: 5
   request_timeout: 600
   telemetry: False
-  context_window_fallbacks: [{"gpt-3.5-turbo": ["gpt-3.5-turbo-large"]}]
+  context_window_fallbacks: []
+  provider_specific_header:
+    custom_llm_provider: "openai,anthropic,openrouter,google,bedrock,vertex_ai,groq,mistral,cohere,azure,replicate,togetherai,fireworks,anyscale,huggingface,databricks,ollama,nvidia,cerebras,deepinfra,perplexity,friendliai,novita,hosted_vllm,predibase,sambanova,vllm,text_completion_openai,azure_ai,palm,ai21,aleph_alpha,nlp_cloud,petals,deepgram,assemblyai,elevenlabs,speechify,runpod,modal,local_server"  # Apply to ALL major providers
+    extra_headers:
+      HTTP-Referer: "https://skypiea.io"
+      X-Title: "Skypiea Gateway"
   default_team_settings: 
     - team_id: team-1
       success_callback: ["langfuse"]
@@ -193,8 +68,9 @@ router_settings:
   enable_pre_call_checks: true
   model_group_alias: {"my-special-fake-model-alias-name": "fake-openai-endpoint-3"} 
 
-general_settings: 
-  master_key: sk-1234 # [OPTIONAL] Use to enforce auth on proxy. See - https://docs.litellm.ai/docs/proxy/virtual_keys
+general_settings:
+  # master_key: sk-1234 # [OPTIONAL] Use to enforce auth on proxy. See - https://docs.litellm.ai/docs/proxy/virtual_keys
+  # Disable auth for testing
   store_model_in_db: True
   proxy_budget_rescheduler_min_time: 60
   proxy_budget_rescheduler_max_time: 64
