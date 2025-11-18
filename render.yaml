@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: openai-proxy
+    name: skypiea-gateway
     runtime: image
     image:
-      url: ghcr.io/berriai/litellm:main-stable
+      url: ghcr.io/itsreiji/litellm:latest
     envVars:
       - key: PORT
         value: 4000

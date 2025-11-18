@@ -1,22 +1,23 @@
 services:
-  litellm:
+  skypiea-gateway:
+    container_name: skypiea-gateway
     build:
       context: .
       args:
         target: runtime
-    image: ghcr.io/berriai/litellm:main-stable
+    image: ghcr.io/itsreiji/litellm:latest
     #########################################
     ## Uncomment these lines to start proxy with a config.yaml file ##
-    # volumes:
-    #  - ./config.yaml:/app/config.yaml
-    # command:
-    #  - "--config=/app/config.yaml"
+    volumes:
+     - ./proxy_server_config.yaml:/app/proxy_server_config.yaml
+    command:
+     - "--config=/app/proxy_server_config.yaml"
     ##############################################
     ports:
       - "4000:4000" # Map the container port to the host, change the host port if necessary
-    environment:
-      DATABASE_URL: "postgresql://llmproxy:dbpassword9090@db:5432/litellm"
-      STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
+    # environment:
+    #   DATABASE_URL: "postgresql://llmproxy:dbpassword9090@db:5432/litellm"
+    #   STORE_MODEL_IN_DB: "True" # allows adding models to proxy via UI
     env_file:
       - .env # Load local .env file
     depends_on:
@@ -29,7 +30,7 @@ services:
       start_period: 40s  # Wait 40 seconds after container start before beginning health checks
 
   db:
-    image: postgres:16
+    image: postgres:18
     restart: always
     container_name: litellm_db
     environment:
@@ -47,6 +48,7 @@ services:
       retries: 10
 
   prometheus:
+    container_name: prometheus
     image: prom/prometheus
     volumes:
       - prometheus_data:/prometheus

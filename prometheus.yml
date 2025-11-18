@@ -2,6 +2,6 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'litellm'
+  - job_name: 'skypiea-gateway'
     static_configs:
-      - targets: ['litellm:4000']  # Assuming Litellm exposes metrics at port 4000
+      - targets: ['skypiea-gateway:4000']  # Assuming skypiea-gateway exposes metrics at port 4000

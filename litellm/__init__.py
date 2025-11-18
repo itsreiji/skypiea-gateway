@@ -7,6 +7,11 @@ warnings.filterwarnings("ignore", message=".*conflict with protected namespace.*
 warnings.filterwarnings(
     "ignore", message=".*Accessing the.*attribute on the instance is deprecated.*"
 )
+
+# Skypiea Gateway branding
+__version__ = "1.0.0-skypiea"
+__name__ = "🚀 Skypiea Gateway - Modern LLM Proxy"
+
 ### INIT VARIABLES #######################
 import threading
 import os
@@ -211,10 +216,10 @@ store_audit_logs = False  # Enterprise feature, allow users to see audit logs
 ### end of callbacks #############
 
 email: Optional[str] = (
-    None  # Not used anymore, will be removed in next MAJOR release - https://github.com/BerriAI/litellm/discussions/648
+    None  # Not used anymore, will be removed in next MAJOR release - https://github.com/itsreiji/litellm/discussions/648
 )
 token: Optional[str] = (
-    None  # Not used anymore, will be removed in next MAJOR release - https://github.com/BerriAI/litellm/discussions/648
+    None  # Not used anymore, will be removed in next MAJOR release - https://github.com/itsreiji/litellm/discussions/648
 )
 telemetry = True
 max_tokens: int = DEFAULT_MAX_TOKENS  # OpenAI Defaults
@@ -353,7 +358,7 @@ aclient_session: Optional[httpx.AsyncClient] = None
 model_fallbacks: Optional[List] = None  # Deprecated for 'litellm.fallbacks'
 model_cost_map_url: str = os.getenv(
     "LITELLM_MODEL_COST_MAP_URL",
-    "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json",
+    "https://raw.githubusercontent.com/itsreiji/litellm/main/model_prices_and_context_window.json",
 )
 suppress_debug_info = False
 dynamodb_table_name: Optional[str] = None
@@ -598,6 +603,7 @@ def is_openai_finetune_model(key: str) -> bool:
 
 
 def add_known_models():
+    print(f"DEBUG: add_known_models called with {len(model_cost)} models")
     for key, value in model_cost.items():
         if value.get("litellm_provider") == "openai" and not is_openai_finetune_model(
             key
@@ -618,6 +624,7 @@ def add_known_models():
         elif value.get("litellm_provider") == "empower":
             empower_models.add(key)
         elif value.get("litellm_provider") == "openrouter":
+            print(f"DEBUG: Adding openrouter model: {key}")
             openrouter_models.add(key)
         elif value.get("litellm_provider") == "vercel_ai_gateway":
             vercel_ai_gateway_models.add(key)
@@ -797,7 +804,7 @@ def add_known_models():
         elif value.get("litellm_provider") == "lemonade":
             lemonade_models.add(key)
 
-
+print(f"DEBUG: About to call add_known_models, model_cost has {len(model_cost)} items")
 add_known_models()
 # known openai compatible endpoints - we'll eventually move this list to the model_prices_and_context_window.json dictionary
 

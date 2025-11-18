@@ -8,6 +8,7 @@ import ModelsAndEndpointsView from "@/app/(dashboard)/models-and-endpoints/Model
 const ModelsAndEndpointsPage = () => {
   const { token, accessToken, userRole, userId, premiumUser } = useAuthorized();
   const [keys, setKeys] = useState<null | any[]>([]);
+  const [modelData, setModelData] = useState<{ data: any[] }>({ data: [] });
 
   const { teams } = useTeams();
 
@@ -17,9 +18,9 @@ const ModelsAndEndpointsPage = () => {
       token={token}
       userRole={userRole}
       userID={userId}
-      modelData={{ data: [] }}
+      modelData={modelData}
       keys={keys}
-      setModelData={() => {}}
+      setModelData={setModelData}
       premiumUser={premiumUser}
       teams={teams}
     />

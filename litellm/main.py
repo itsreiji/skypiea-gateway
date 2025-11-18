@@ -2715,8 +2715,8 @@ def completion(  # type: ignore # noqa: PLR0915
                 or get_secret("OR_API_KEY")
             )
 
-            openrouter_site_url = get_secret("OR_SITE_URL") or "https://litellm.ai"
-            openrouter_app_name = get_secret("OR_APP_NAME") or "liteLLM"
+            openrouter_site_url = get_secret("OR_SITE_URL") or "https://skypiea.io"
+            openrouter_app_name = get_secret("OR_APP_NAME") or "Skypiea Gateway"
 
             openrouter_headers = {
                 "HTTP-Referer": openrouter_site_url,
@@ -2778,8 +2778,8 @@ def completion(  # type: ignore # noqa: PLR0915
                 api_key or litellm.api_key or get_secret("VERCEL_AI_GATEWAY_API_KEY")
             )
 
-            vercel_site_url = get_secret("VERCEL_SITE_URL") or "https://litellm.ai"
-            vercel_app_name = get_secret("VERCEL_APP_NAME") or "liteLLM"
+            vercel_site_url = get_secret("VERCEL_SITE_URL") or "https://skypiea.io"
+            vercel_app_name = get_secret("VERCEL_APP_NAME") or "Skypiea Gateway"
 
             vercel_headers = {
                 "http-referer": vercel_site_url,
