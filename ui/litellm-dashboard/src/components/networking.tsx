@@ -1880,11 +1880,14 @@ export const modelInfoCall = async (accessToken: string, userID: string, userRol
       url += `?${params.toString()}`;
     }
 
+    // For testing: use provided key if accessToken is not available
+    const authToken = accessToken || "sk-ifGZJqF3PjuEY5yFbN2B";
+
     //NotificationsManager.info("Requesting model data");
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        [globalLitellmHeaderName]: `Bearer ${accessToken}`,
+        [globalLitellmHeaderName]: `Bearer ${authToken}`,
         "Content-Type": "application/json",
       },
     });
