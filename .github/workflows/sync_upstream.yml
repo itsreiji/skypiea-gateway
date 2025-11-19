@@ -1,0 +1,48 @@
+name: Sync Upstream
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Jalan setiap hari jam 00:00 UTC
+  workflow_dispatch: # Bisa dijalankan manual
+
+jobs:
+  sync-and-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Ambil semua history biar bisa switch branch
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Sync Main from Upstream
+        run: |
+          # 1. Tambah remote upstream
+          git remote add upstream https://github.com/BerriAI/litellm.git
+          git fetch upstream
+
+          # 2. Pindah ke main dan merge dari upstream
+          git checkout main
+          git merge upstream/main
+          
+          # 3. Push update ke origin/main
+          git push origin main
+
+      - name: Merge Main into Skypiea-Dev
+        run: |
+          # 1. Pindah ke branch kerjaan (skypiea-dev)
+          git checkout skypiea-dev
+          
+          # 2. Merge main (yang baru di-update) ke skypiea-dev
+          git merge main
+          
+          # 3. Push ke origin/skypiea-dev
+          git push origin skypiea-dev
