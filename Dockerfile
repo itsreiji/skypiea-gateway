@@ -61,7 +61,7 @@ RUN ls -la /app
 # Copy the built wheel from the builder stage to the runtime stage; assumes only one wheel file is present
 COPY --from=builder /app/dist/*.whl .
 COPY --from=builder /wheels/ /wheels/
-COPY proxy_server_config.yaml /app/
+# COPY proxy_config.yaml /app/
 
 # Install the built wheel using pip; again using a wildcard if it's the only file
 RUN pip install --no-cache-dir *.whl && pip install --no-cache-dir -r requirements.txt && rm -f *.whl

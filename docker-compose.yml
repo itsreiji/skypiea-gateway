@@ -14,8 +14,8 @@ services:
       args:
         target: runtime
     image: ghcr.io/itsreiji/skypiea-gateway:latest
-    command:
-      - "--config=/app/proxy_server_config.yaml"
+    # command:
+    #   - "--config=/app/proxy_server_config.yaml"
     ports:
       - "4000:4000"
     environment:
@@ -23,17 +23,32 @@ services:
       - LITELLM_SALT_KEY=${LITELLM_SALT_KEY}
       - DATABASE_URL=${DATABASE_URL}
       - STORE_MODEL_IN_DB=${STORE_MODEL_IN_DB}
+      - STORE_PROMPTS_IN_SPEND_LOGS=${STORE_PROMPTS_IN_SPEND_LOGS}
       - UI_USERNAME=${UI_USERNAME}
       - UI_PASSWORD=${UI_PASSWORD}
-    restart: unless-stopped
+      - DOCS_TITLE=${DOCS_TITLE}
+      - DOCS_DESCRIPTION=${DOCS_DESCRIPTION}
+    restart: always
+    healthcheck:  # Defines the health check configuration for the container
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 http://localhost:4000/health/liveliness || exit 1" ]  # Command to execute for health check
+      interval: 30s  # Perform health check every 30 seconds
+      timeout: 10s   # Health check command times out after 10 seconds
+      retries: 3     # Retry up to 3 times if health check fails
+      start_period: 40s  # Wait 40 seconds after container start before beginning health checks
 
   # Prometheus monitoring (optional)
   prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
+    image: prom/prometheus
     volumes:
       - prometheus_data:/prometheus
-    restart: unless-stopped
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+    restart: always
 
 # -----------------------------------------------------------------
 # Disabled internal Postgres (use Supabase instead)
