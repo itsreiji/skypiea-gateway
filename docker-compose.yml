@@ -13,8 +13,7 @@ services:
       context: .
       args:
         target: runtime
-    image: ghcr.io/itsreiji/litellm:latest
-    # Uncomment the lines below if you want to mount a custom config file
+    image: ghcr.io/itsreiji/skypiea-gateway:latest
     volumes:
       - ${PWD}/proxy_server_config.yaml:/app/proxy_server_config.yaml
     command:
