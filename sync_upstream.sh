@@ -1,79 +1,137 @@
 #!/bin/bash
 
-# Script Otomatis Sync Upstream (Versi Mac/Linux)
-# Jalanin script ini kapan aja kamu mau update repo kamu.
-# Cara pakai:
-# 1. chmod +x sync_upstream.sh
-# 2. ./sync_upstream.sh
+# sync_upstream.sh
+# Syncs the local repository with the upstream repository, resetting the main branch.
+# Implements self-preservation logic to backup itself and handle gitignore.
 
-echo -e "\033[0;36m🚀 Memulai proses Sync Upstream...\033[0m"
+# Colors for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-# 1. Cek Remote Upstream
-if ! git remote | grep -q "upstream"; then
-    echo -e "\033[0;33m🔗 Menambahkan remote upstream...\033[0m"
-    git remote add upstream https://github.com/BerriAI/litellm.git
-else
-    echo -e "\033[0;32m✅ Remote upstream sudah ada.\033[0m"
+log_info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+log_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# --- Self-Preservation Start ---
+SCRIPT_NAME=$(basename "$0")
+PS_SCRIPT_NAME="sync_upstream.ps1"
+TEMP_DIR=$(mktemp -d)
+BACKUP_SCRIPT="$TEMP_DIR/$SCRIPT_NAME"
+BACKUP_PS_SCRIPT="$TEMP_DIR/$PS_SCRIPT_NAME"
+
+log_info "Starting self-preservation..."
+
+# Backup scripts
+if [ -f "$0" ]; then
+    cp "$0" "$BACKUP_SCRIPT"
+    log_info "Backed up $SCRIPT_NAME to $BACKUP_SCRIPT"
 fi
 
-# 2. Ambil update terbaru dari internet
-echo -e "\033[0;33m⬇️  Mengambil data terbaru dari upstream...\033[0m"
+if [ -f "$PS_SCRIPT_NAME" ]; then
+    cp "$PS_SCRIPT_NAME" "$BACKUP_PS_SCRIPT"
+    log_info "Backed up $PS_SCRIPT_NAME to $BACKUP_PS_SCRIPT"
+fi
+
+# Ensure .gitignore includes scripts
+ensure_gitignore() {
+    local file=$1
+    if ! grep -q "^$file$" .gitignore; then
+        log_info "Adding $file to .gitignore"
+        echo "$file" >> .gitignore
+    else
+        log_info "$file already in .gitignore"
+    fi
+}
+
+ensure_gitignore "$SCRIPT_NAME"
+ensure_gitignore "$PS_SCRIPT_NAME"
+
+# Unstage scripts if tracked
+if git ls-files --error-unmatch "$SCRIPT_NAME" > /dev/null 2>&1; then
+    log_warn "Unstaging $SCRIPT_NAME"
+    git rm --cached "$SCRIPT_NAME"
+fi
+
+if git ls-files --error-unmatch "$PS_SCRIPT_NAME" > /dev/null 2>&1; then
+    log_warn "Unstaging $PS_SCRIPT_NAME"
+    git rm --cached "$PS_SCRIPT_NAME"
+fi
+# --- Self-Preservation End ---
+
+# Fetch upstream
+log_info "Fetching upstream..."
+if ! git remote get-url upstream > /dev/null 2>&1; then
+    log_error "Remote 'upstream' not found. Please add it with 'git remote add upstream <url>'."
+    exit 1
+fi
 git fetch upstream
 
-# 3. Update Branch MAIN
-echo -e "\033[0;33m🔄 Mengupdate branch MAIN...\033[0m"
-git checkout main
-if [ $? -ne 0 ]; then
-    echo -e "\033[0;31mGagal pindah ke main. Pastikan tidak ada perubahan yang belum di-commit.\033[0m"
+# Determine main branch
+if git show-ref --verify --quiet refs/remotes/upstream/main; then
+    MAIN_BRANCH="main"
+elif git show-ref --verify --quiet refs/remotes/upstream/master; then
+    MAIN_BRANCH="master"
+else
+    log_error "Could not detect 'main' or 'master' branch on upstream."
     exit 1
 fi
 
-echo -e "\033[0;36m📋 Mengecek perubahan yang akan di-merge dari upstream/main...\033[0m"
-if git log --oneline --graph upstream/main..HEAD >/dev/null 2>&1; then
-    echo -e "\033[0;35m📊 File yang akan terpengaruh:\033[0m"
-    git diff --stat upstream/main..HEAD
-    echo ""
+log_info "Detected main branch: $MAIN_BRANCH"
+
+# Switch to main branch locally
+if git show-ref --verify --quiet refs/heads/$MAIN_BRANCH; then
+    log_info "Switching to local $MAIN_BRANCH..."
+    git checkout $MAIN_BRANCH
 else
-    echo -e "\033[0;34mℹ️  Tidak ada perubahan baru dari upstream.\033[0m"
+    log_info "Creating local $MAIN_BRANCH from upstream/$MAIN_BRANCH..."
+    git checkout -b $MAIN_BRANCH upstream/$MAIN_BRANCH
 fi
 
-git merge upstream/main
-if [ $? -eq 0 ]; then
-    echo -e "\033[0;32m📝 Commit yang berhasil di-merge:\033[0m"
-    git log --oneline -5 HEAD~1..HEAD
-    echo ""
+# Reset to upstream
+log_info "Resetting $MAIN_BRANCH to upstream/$MAIN_BRANCH..."
+git reset --hard upstream/$MAIN_BRANCH
+
+# Delete other local branches
+log_info "Cleaning up other local branches..."
+# List all branches, exclude the current one (main/master), and delete them.
+# sed 's/^[ *]*//' removes the asterisk and spaces from 'git branch' output
+git branch | grep -v "^[ *]*$MAIN_BRANCH$" | while read -r branch; do
+    branch=$(echo "$branch" | sed 's/^[ *]*//')
+    if [ -n "$branch" ]; then
+        log_info "Deleting branch: $branch"
+        git branch -D "$branch"
+    fi
+done
+
+# --- Restoration Start ---
+log_info "Restoring scripts from backup..."
+if [ -f "$BACKUP_SCRIPT" ]; then
+    cp "$BACKUP_SCRIPT" "$SCRIPT_NAME"
+    chmod +x "$SCRIPT_NAME"
+    log_info "Restored $SCRIPT_NAME"
 fi
 
-git push origin main
-
-# 4. Update Branch SKYPIEA-DEV
-echo -e "\033[0;33m🛠️  Mengupdate branch SKYPIEA-DEV...\033[0m"
-git checkout skypiea-dev
-if [ $? -ne 0 ]; then
-    echo -e "\033[0;31mGagal pindah ke skypiea-dev.\033[0m"
-    exit 1
+if [ -f "$BACKUP_PS_SCRIPT" ]; then
+    cp "$BACKUP_PS_SCRIPT" "$PS_SCRIPT_NAME"
+    log_info "Restored $PS_SCRIPT_NAME"
 fi
 
-echo -e "\033[0;36m📋 Mengecek perubahan yang akan di-merge dari main...\033[0m"
-if git log --oneline --graph main..HEAD >/dev/null 2>&1; then
-    echo -e "\033[0;35m📊 File yang akan terpengaruh:\033[0m"
-    git diff --stat main..HEAD
-    echo ""
-else
-    echo -e "\033[0;34mℹ️  Branch skypiea-dev sudah up-to-date dengan main.\033[0m"
-fi
+# Re-apply gitignore check (since reset --hard might have reverted .gitignore)
+ensure_gitignore "$SCRIPT_NAME"
+ensure_gitignore "$PS_SCRIPT_NAME"
 
-git merge main
-if [ $? -ne 0 ]; then
-    echo -e "\033[0;31m⚠️  ADA CONFLICT! Script berhenti.\033[0m"
-    echo -e "\033[0;31mSilakan selesaikan conflict secara manual, lalu commit dan push.\033[0m"
-    exit 1
-else
-    echo -e "\033[0;32m📝 Commit yang berhasil di-merge:\033[0m"
-    git log --oneline -5 HEAD~1..HEAD
-    echo ""
-fi
+# Remove temp dir
+rm -rf "$TEMP_DIR"
+# --- Restoration End ---
 
-git push origin skypiea-dev
-
-echo -e "\033[0;32m✅ Selesai! Semua branch sudah update.\033[0m"
+log_info "Sync complete! You are now on $MAIN_BRANCH, identical to upstream/$MAIN_BRANCH."

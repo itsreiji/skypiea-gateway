@@ -19,9 +19,11 @@ interface TagInfoViewProps {
   accessToken: string | null;
   is_admin: boolean;
   editTag: boolean;
+  userID: string | null;
+  userRole: string | null;
 }
 
-const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, is_admin, editTag }) => {
+const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, is_admin, editTag, userID, userRole }) => {
   const [form] = Form.useForm();
   const [tagDetails, setTagDetails] = useState<Tag | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(editTag);
@@ -66,12 +68,10 @@ const TagInfoView: React.FC<TagInfoViewProps> = ({ tagId, onClose, accessToken, 
   }, [tagId, accessToken]);
 
   useEffect(() => {
-    if (accessToken) {
-      // Using dummy values for userID and userRole since they're required by the function
-      // TODO: Pass these as props if needed for the actual API implementation
-      fetchUserModels("dummy-user", "Admin", accessToken, setUserModels);
+    if (accessToken && userID && userRole) {
+      fetchUserModels(userID, userRole, accessToken, setUserModels);
     }
-  }, [accessToken]);
+  }, [accessToken, userID, userRole]);
 
   const handleSave = async (values: any) => {
     if (!accessToken) return;

@@ -3,8 +3,7 @@ import { ArrowLeftIcon, EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 import { Title, Card, Button, Text, Grid, TabGroup, TabList, TabPanel, TabPanels, Tab, Icon } from "@tremor/react";
 
 import { MCPServer, handleTransport, handleAuth } from "./types";
-// TODO: Move Tools viewer from index file
-import { MCPToolsViewer } from ".";
+import MCPToolsViewer from "./mcp_tools";
 import MCPServerEdit from "./mcp_server_edit";
 import MCPServerCostDisplay from "./mcp_server_cost_display";
 import { getMaskedAndFullUrl } from "./utils";
@@ -22,6 +21,10 @@ interface MCPServerViewProps {
   userID: string | null;
   availableAccessGroups: string[];
 }
+
+const TAB_INDEX_OVERVIEW = 0;
+const TAB_INDEX_TOOLS = 1;
+const TAB_INDEX_SETTINGS = 2;
 
 export const MCPServerView: React.FC<MCPServerViewProps> = ({
   mcpServer,
@@ -72,11 +75,10 @@ export const MCPServerView: React.FC<MCPServerViewProps> = ({
               size="small"
               icon={copiedStates["mcp-server_name"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(mcpServer.server_name, "mcp-server_name")}
-              className={`left-2 z-10 transition-all duration-200 ${
-                copiedStates["mcp-server_name"]
-                  ? "text-green-600 bg-green-50 border-green-200"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+              className={`left-2 z-10 transition-all duration-200 ${copiedStates["mcp-server_name"]
+                ? "text-green-600 bg-green-50 border-green-200"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                }`}
             />
             {mcpServer.alias && (
               <>
@@ -87,11 +89,10 @@ export const MCPServerView: React.FC<MCPServerViewProps> = ({
                   size="small"
                   icon={copiedStates["mcp-alias"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
                   onClick={() => copyToClipboard(mcpServer.alias, "mcp-alias")}
-                  className={`left-2 z-10 transition-all duration-200 ${
-                    copiedStates["mcp-alias"]
-                      ? "text-green-600 bg-green-50 border-green-200"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`left-2 z-10 transition-all duration-200 ${copiedStates["mcp-alias"]
+                    ? "text-green-600 bg-green-50 border-green-200"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                    }`}
                 />
               </>
             )}
@@ -103,18 +104,16 @@ export const MCPServerView: React.FC<MCPServerViewProps> = ({
               size="small"
               icon={copiedStates["mcp-server-id"] ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
               onClick={() => copyToClipboard(mcpServer.server_id, "mcp-server-id")}
-              className={`left-2 z-10 transition-all duration-200 ${
-                copiedStates["mcp-server-id"]
-                  ? "text-green-600 bg-green-50 border-green-200"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              }`}
+              className={`left-2 z-10 transition-all duration-200 ${copiedStates["mcp-server-id"]
+                ? "text-green-600 bg-green-50 border-green-200"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                }`}
             />
           </div>
         </div>
       </div>
 
-      {/* TODO: magic number for index */}
-      <TabGroup defaultIndex={editing ? 2 : 0}>
+      <TabGroup defaultIndex={isEditing ? TAB_INDEX_SETTINGS : TAB_INDEX_OVERVIEW}>
         <TabList className="mb-4">
           {[
             <Tab key="overview">Overview</Tab>,
